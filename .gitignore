@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# environment variables
+.env
+.env.*
+
+# build outputs
+build/
+dist/
+
+# Prisma
+prisma/generated/
+
+# common junk
+.DS_Store
+.vscode/
+*.log
+

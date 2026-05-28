@@ -1,0 +1,10 @@
+{
+  "name": "flowstate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "client": "npm --prefix client run start",
+    "server": "npm --prefix server run start"
+  }
+}
+
