@@ -19,8 +19,11 @@ app.get("/health", (req, res) => {
 
 const authRouter = require("./routes/auth");
 const tasksRouter = require("./routes/tasks");
+const sessionsRouter = require("./routes/sessions");
 app.use("/auth", authRouter);
 app.use("/api", tasksRouter);
+app.use("/api", sessionsRouter);
+
 
 
 const PORT = 3000;
