@@ -18,9 +18,13 @@ app.get("/health", (req, res) => {
 });
 
 const authRouter = require("./routes/auth");
+const tasksRouter = require("./routes/tasks");
 app.use("/auth", authRouter);
+app.use("/api", tasksRouter);
+
 
 const PORT = 3000;
+
 app.listen(PORT, () => {
   console.log(`David FlowState server running on port ${PORT}`);
 });
