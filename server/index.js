@@ -1,4 +1,5 @@
 const express = require("express");
+const http = require("node:http");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
@@ -20,16 +21,23 @@ app.get("/health", (req, res) => {
 const authRouter = require("./routes/auth");
 const tasksRouter = require("./routes/tasks");
 const sessionsRouter = require("./routes/sessions");
+const brainDumpRouter = require("./routes/brainDump");
+const { initSocket } = require("./socket");
+
 app.use("/auth", authRouter);
 app.use("/api", tasksRouter);
 app.use("/api", sessionsRouter);
+app.use("/api", brainDumpRouter);
 
 
+const httpServer = http.createServer(app);
+initSocket(httpServer);
 
 const PORT = 3000;
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`David FlowState server running on port ${PORT}`);
 });
+
 
 
