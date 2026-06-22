@@ -22,13 +22,19 @@ const authRouter = require("./routes/auth");
 const tasksRouter = require("./routes/tasks");
 const sessionsRouter = require("./routes/sessions");
 const brainDumpRouter = require("./routes/brainDump");
+const debugBrainDumpRouter = require("./routes/debugBrainDump");
 const { initSocket } = require("./socket");
 
 app.use("/auth", authRouter);
+// PUBLIC brain-dump endpoints (must be registered before any potentially protected /api routes)
+app.use("/api/brain-dump", brainDumpRouter);
+app.use("/api/brain-dump-debug", debugBrainDumpRouter);
+
 app.use("/api", tasksRouter);
 app.use("/api", sessionsRouter);
-// Brain-dump is public (no auth). Keep /api tasks & sessions protected.
-app.use("/api", brainDumpRouter);
+
+
+
 
 
 
