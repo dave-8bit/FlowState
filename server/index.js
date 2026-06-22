@@ -28,7 +28,8 @@ app.use("/auth", authRouter);
 app.use("/api", tasksRouter);
 app.use("/api", sessionsRouter);
 // Brain-dump is public (no auth). Keep /api tasks & sessions protected.
-app.post("/api/brain-dump", brainDumpRouter);
+app.use("/api", brainDumpRouter);
+
 
 
 
