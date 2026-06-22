@@ -27,7 +27,9 @@ const { initSocket } = require("./socket");
 app.use("/auth", authRouter);
 app.use("/api", tasksRouter);
 app.use("/api", sessionsRouter);
-app.use("/api", brainDumpRouter);
+// Brain-dump is public (no auth). Keep /api tasks & sessions protected.
+app.post("/api/brain-dump", brainDumpRouter);
+
 
 
 const httpServer = http.createServer(app);
