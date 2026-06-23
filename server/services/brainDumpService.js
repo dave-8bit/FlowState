@@ -89,6 +89,13 @@ const fallbackTasks = (input) => [
   },
 ];
 
+const validateAndNormalize = (parsed) => {
+  const normalized = normalizeResponse(parsed);
+  if (!normalized || normalized.length === 0) return null;
+  return normalized;
+};
+
+
 const getBrainDumpTasks = async ({ input }) => {
   const groqApiKey = process.env.GROQ_API_KEY;
   if (!groqApiKey) {
@@ -153,7 +160,7 @@ const getBrainDumpTasks = async ({ input }) => {
   const userPrompt = `Brain dump:\n${input}\n\nReturn: ${JSON.stringify(schema)}`;
 
   const completion = await client.chat.completions.create({
-    model: "llama-3.1-70b-versatile",
+    model: "llama3-8b-8192", 
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
@@ -182,4 +189,5 @@ const getBrainDumpTasks = async ({ input }) => {
 };
 
 module.exports = { getBrainDumpTasks };
+
 
