@@ -26,13 +26,14 @@ router.post("/", validateBody, async (req, res) => {
 
     return res.json({ tasks });
   } catch (err) {
-    if (err && err.message && err.message.includes("401")) {
-      return res.status(500).json({ error: "Groq request failed" });
-    }
-    return res.status(500).json({ error: "Failed to generate brain-dump tasks" });
-  }
-});
+  console.error("BRAIN_DUMP_ERROR_STACK:", err);
 
+  return res.status(500).json({
+    error: "Failed to generate brain-dump tasks",
+    message: err?.message,
+    stack: err?.stack
+  });
+}});
 
 module.exports = router;
 

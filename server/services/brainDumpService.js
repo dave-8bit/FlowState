@@ -160,7 +160,7 @@ const getBrainDumpTasks = async ({ input }) => {
   const userPrompt = `Brain dump:\n${input}\n\nReturn: ${JSON.stringify(schema)}`;
 
   const completion = await client.chat.completions.create({
-    model: "llama3-8b-8192", 
+    model: "llama-3.1-8b-instant",
     temperature: 0,
     response_format: { type: "json_object" },
     messages: [
