@@ -18,7 +18,7 @@ const validateBody = (req, res, next) => {
   return next();
 };
 
-router.post("/brain-dump", validateBody, async (req, res) => {
+router.post("/", validateBody, async (req, res) => {
   try {
     const { input } = req.body;
 
