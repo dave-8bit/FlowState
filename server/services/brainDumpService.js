@@ -13,44 +13,54 @@ const safeNumber = (value) => {
 
 const normalizeResponse = (raw) => {
   if (!raw || typeof raw !== "object") return null;
+
   const tasks = raw.tasks;
   if (!Array.isArray(tasks)) return null;
 
   const normalized = [];
+
   for (const t of tasks) {
-    if (!t || typeof t !== "object") return null;
+    if (!t || typeof t !== "object") continue;
 
-    const title = t.title;
-    const description = t.description;
-    const priority = t.priority;
+    const title = typeof t.title === "string" ? t.title : "";
+    const descriptionRaw = t.description;
+    const description = typeof descriptionRaw === "string" ? descriptionRaw : "";
+
+    const priorityRaw = t.priority;
+    const priority = typeof priorityRaw === "string" ? priorityRaw.toUpperCase() : "";
+
+    // accept string or number; coerce to number
     const estimatedMinutes = safeNumber(t.estimatedMinutes);
+
     const suggestedDeadline =
-      t.suggestedDeadline === undefined ? null : t.suggestedDeadline;
-    const subtasks = t.subtasks;
-    const tags = t.tags;
+      t.suggestedDeadline === undefined || t.suggestedDeadline === null
+        ? null
+        : typeof t.suggestedDeadline === "string"
+          ? t.suggestedDeadline
+          : null;
 
-    if (typeof title !== "string" || title.trim() === "") return null;
-    if (typeof description !== "string") return null;
-    if (!REQUIRED_PRIORITIES.has(priority)) return null;
-    if (estimatedMinutes === null || estimatedMinutes < 0) return null;
+    const subtasks = Array.isArray(t.subtasks) ? t.subtasks : [];
+    const tags = Array.isArray(t.tags) ? t.tags : [];
 
-    if (
-      suggestedDeadline !== null &&
-      typeof suggestedDeadline !== "string"
-    ) {
-      return null;
-    }
+    if (title.trim().length === 0) continue;
+    if (!REQUIRED_PRIORITIES.has(priority)) continue;
+    if (estimatedMinutes === null || estimatedMinutes < 0) continue;
 
-    if (!Array.isArray(subtasks)) return null;
+    // subtasks: best-effort; skip invalid subtasks
+    const normalizedSubtasks = [];
     for (const st of subtasks) {
-      if (!st || typeof st !== "object") return null;
-      if (typeof st.title !== "string" || st.title.trim() === "") return null;
-      if (st.done !== false && st.done !== true) return null;
+      if (!st || typeof st !== "object") continue;
+      const stTitle = typeof st.title === "string" ? st.title : "";
+      if (stTitle.trim().length === 0) continue;
+      normalizedSubtasks.push({ title: stTitle, done: false });
     }
 
-    if (!Array.isArray(tags)) return null;
+    // tags: best-effort
+    const normalizedTags = [];
     for (const tag of tags) {
-      if (typeof tag !== "string") return null;
+      if (typeof tag === "string" && tag.trim() !== "") {
+        normalizedTags.push(tag);
+      }
     }
 
     normalized.push({
@@ -59,16 +69,25 @@ const normalizeResponse = (raw) => {
       priority,
       estimatedMinutes,
       suggestedDeadline,
-      subtasks: subtasks.map((st) => ({
-        title: st.title,
-        done: false,
-      })),
-      tags,
+      subtasks: normalizedSubtasks,
+      tags: normalizedTags,
     });
   }
 
-  return normalized;
+  return normalized.length > 0 ? normalized : null;
 };
+
+const fallbackTasks = (input) => [
+  {
+    title: "Brain dump task",
+    description: typeof input === "string" ? input.slice(0, 500) : "",
+    priority: "MEDIUM",
+    estimatedMinutes: 25,
+    suggestedDeadline: null,
+    subtasks: [],
+    tags: [],
+  },
+];
 
 const getBrainDumpTasks = async ({ input }) => {
   const groqApiKey = process.env.GROQ_API_KEY;
@@ -76,7 +95,6 @@ const getBrainDumpTasks = async ({ input }) => {
     throw new Error("Missing GROQ_API_KEY");
   }
 
-  // Note: groq-sdk may not be installed yet; this file expects it.
   const client = new Groq({ apiKey: groqApiKey });
 
   const schema = {
@@ -132,8 +150,7 @@ const getBrainDumpTasks = async ({ input }) => {
   const systemPrompt =
     "You are a task extraction engine. Convert the user's brain dump into structured tasks. Return STRICT JSON that matches the provided JSON schema. Do not include any other text.";
 
-  const userPrompt =
-    `Brain dump:\n${input}\n\nReturn: ${JSON.stringify(schema)}`;
+  const userPrompt = `Brain dump:\n${input}\n\nReturn: ${JSON.stringify(schema)}`;
 
   const completion = await client.chat.completions.create({
     model: "llama-3.1-70b-versatile",
@@ -146,6 +163,7 @@ const getBrainDumpTasks = async ({ input }) => {
   });
 
   const content = completion?.choices?.[0]?.message?.content;
+
   let parsed;
   try {
     parsed = typeof content === "string" ? JSON.parse(content) : content;
@@ -154,8 +172,10 @@ const getBrainDumpTasks = async ({ input }) => {
   }
 
   const normalizedTasks = normalizeResponse(parsed);
-  if (!normalizedTasks) {
-    throw new Error("AI response did not match schema");
+
+  // Never hard-fail on slightly malformed-but-usable AI output
+  if (!normalizedTasks || normalizedTasks.length === 0) {
+    return fallbackTasks(input);
   }
 
   return normalizedTasks;
