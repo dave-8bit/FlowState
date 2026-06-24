@@ -1,10 +1,15 @@
 const baseURL = 'http://localhost:3000'
 
+import { getToken } from '../features/auth/token.js'
+
 async function postJSON(path, body) {
+  const token = getToken()
+
   const res = await fetch(`${baseURL}${path}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
   })
@@ -23,4 +28,5 @@ const client = {
 
 export { baseURL }
 export default client
+
 

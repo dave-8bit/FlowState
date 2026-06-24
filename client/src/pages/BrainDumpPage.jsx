@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useBrainDump } from '../features/brainDump/brainDumpHooks.js'
+import { useTaskActions } from '../features/tasks/taskHooks.js'
 import './BrainDumpPage.css'
 
 function normalizePriority(priority) {
@@ -15,6 +16,8 @@ function normalizePriority(priority) {
 export default function BrainDumpPage() {
   const [input, setInput] = useState('')
   const { loading, error, tasks, generate } = useBrainDump()
+  const { loading: saving, error: saveError, createTasks } = useTaskActions()
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
   return (
     <div className="brainDumpPage">
@@ -42,7 +45,10 @@ export default function BrainDumpPage() {
         <div className="brainDumpActions">
           <button
             type="button"
-            onClick={() => generate(input)}
+            onClick={() => {
+              setSaveSuccess(false)
+              generate(input)
+            }}
             disabled={loading}
             className="brainDumpButton"
           >
@@ -57,6 +63,27 @@ export default function BrainDumpPage() {
         {Array.isArray(tasks) && tasks.length > 0 ? (
           <>
             <div className="brainDumpResultsHeader">Generated tasks</div>
+
+            <div className="brainDumpActions" style={{ marginTop: 0, marginBottom: 14 }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  setSaveSuccess(false)
+                  const created = await createTasks(tasks)
+                  if (created && Array.isArray(created)) setSaveSuccess(true)
+                }}
+                disabled={saving}
+                className="brainDumpButton"
+              >
+                {saving ? 'Saving...' : 'Save Generated Tasks'}
+              </button>
+            </div>
+
+            {saveError ? (
+              <div className="brainDumpError">{String(saveError?.message ?? saveError)}</div>
+            ) : null}
+            {saveSuccess ? <div className="brainDumpError" style={{ color: '#16a34a' }}>Saved!</div> : null}
+
             <div className="brainDumpCards">
               {tasks.map((task, idx) => {
                 const priority = normalizePriority(task?.priority)
@@ -97,6 +124,7 @@ export default function BrainDumpPage() {
     </div>
   )
 }
+
 
 
 

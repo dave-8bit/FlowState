@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/HomePage.jsx'
 import BrainDumpPage from './pages/BrainDumpPage.jsx'
+import { useAuthBootstrap } from './features/auth/useAuthBootstrap.js'
 
 export default function App() {
+  useAuthBootstrap()
+
   return (
     <BrowserRouter>
       <Routes>
@@ -12,5 +15,8 @@ export default function App() {
     </BrowserRouter>
   )
 }
+
+
+
 
 
