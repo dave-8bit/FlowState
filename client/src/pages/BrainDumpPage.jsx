@@ -1,4 +1,102 @@
-export default function BrainDumpPage() {
-  return <div>Brain Dump Page</div>
+import { useState } from 'react'
+import { useBrainDump } from '../features/brainDump/brainDumpHooks.js'
+import './BrainDumpPage.css'
+
+function normalizePriority(priority) {
+  if (!priority) return 'LOW'
+  const p = String(priority).trim().toUpperCase()
+  if (p === 'CRITICAL') return 'CRITICAL'
+  if (p === 'HIGH') return 'HIGH'
+  if (p === 'MEDIUM') return 'MEDIUM'
+  if (p === 'LOW') return 'LOW'
+  return 'LOW'
 }
+
+export default function BrainDumpPage() {
+  const [input, setInput] = useState('')
+  const { loading, error, tasks, generate } = useBrainDump()
+
+  return (
+    <div className="brainDumpPage">
+      <div className="brainDumpHeader">
+        <h1 className="brainDumpTitle">FlowState Brain Dump</h1>
+        <p className="brainDumpSubtitle">
+          Turn your thoughts into actionable tasks—fast.
+        </p>
+      </div>
+
+      <div className="brainDumpForm">
+        <div className="brainDumpField">
+          <label className="brainDumpLabel" htmlFor="brainDumpInput">
+            Brain dump
+          </label>
+          <textarea
+            id="brainDumpInput"
+            className="brainDumpTextarea"
+            value={input}
+            placeholder="Dump everything on your mind..."
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </div>
+
+        <div className="brainDumpActions">
+          <button
+            type="button"
+            onClick={() => generate(input)}
+            disabled={loading}
+            className="brainDumpButton"
+          >
+            {loading ? 'Generating...' : 'Generate Tasks'}
+          </button>
+        </div>
+
+        {error ? <div className="brainDumpError">{String(error?.message ?? error)}</div> : null}
+      </div>
+
+      <div className="brainDumpResults">
+        {Array.isArray(tasks) && tasks.length > 0 ? (
+          <>
+            <div className="brainDumpResultsHeader">Generated tasks</div>
+            <div className="brainDumpCards">
+              {tasks.map((task, idx) => {
+                const priority = normalizePriority(task?.priority)
+                return (
+                  <div
+                    key={task?.id ?? idx}
+                    className="brainDumpCard"
+                    aria-label={`Task ${idx + 1}`}
+                  >
+                    <div className="brainDumpCardTop">
+                      <h3 className="brainDumpCardTitle">{task?.title}</h3>
+                      <div className={`brainDumpBadge brainDumpBadge--${priority}`}>
+                        {priority}
+                      </div>
+                    </div>
+
+                    <div className="brainDumpMeta">
+                      <div>
+                        <span className="brainDumpMetaLabel">Priority:</span>{' '}
+                        {priority}
+                      </div>
+                      <div>
+                        <span className="brainDumpMetaLabel">Estimated Minutes:</span>{' '}
+                        {task?.estimatedMinutes}
+                      </div>
+                    </div>
+
+                    <p className="brainDumpDescription">{task?.description}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <div>No tasks yet.</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
 

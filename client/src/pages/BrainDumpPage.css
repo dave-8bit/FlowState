@@ -1,0 +1,212 @@
+.brainDumpPage {
+  padding: 24px 16px 40px;
+  text-align: left;
+}
+
+.brainDumpHeader {
+  margin: 0 0 18px;
+}
+
+.brainDumpTitle {
+  font-size: 40px;
+  letter-spacing: -1px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.brainDumpSubtitle {
+  margin: 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.brainDumpForm {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.5);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.brainDumpField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.brainDumpLabel {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.brainDumpTextarea {
+  width: 100%;
+  min-height: 140px;
+  resize: vertical;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  outline: none;
+  font-size: 16px;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.brainDumpTextarea::placeholder {
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.brainDumpTextarea:focus-visible {
+  border-color: var(--accent);
+  outline: 2px solid rgba(170, 59, 255, 0.35);
+  outline-offset: 2px;
+}
+
+.brainDumpActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.brainDumpButton {
+  appearance: none;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.05s;
+}
+
+.brainDumpButton:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.brainDumpButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.brainDumpButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.brainDumpError {
+  margin-top: 14px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.brainDumpResults {
+  margin-top: 18px;
+}
+
+.brainDumpResultsHeader {
+  margin: 0 0 12px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.brainDumpCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+@media (max-width: 768px) {
+  .brainDumpTitle {
+    font-size: 28px;
+  }
+
+  .brainDumpCards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.brainDumpCard {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+.brainDumpCardTop {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.brainDumpCardTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.brainDumpBadge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.brainDumpMeta {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  line-height: 1.35;
+  margin-bottom: 10px;
+}
+
+.brainDumpMetaLabel {
+  opacity: 0.8;
+}
+
+.brainDumpDescription {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.95;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Priority badges */
+.brainDumpBadge--LOW {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #2563eb;
+}
+
+.brainDumpBadge--MEDIUM {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.45);
+  color: #b45309;
+}
+
+.brainDumpBadge--HIGH {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #dc2626;
+}
+
+.brainDumpBadge--CRITICAL {
+  background: rgba(168, 85, 247, 0.14);
+  border-color: rgba(168, 85, 247, 0.55);
+  color: #a21caf;
+}
+
