@@ -1,6 +1,7 @@
 export default function HomePage() {
   return (
     <div style={{ padding: 24 }}>
+
       <h1>FlowState</h1>
       <p>Sign in to start saving tasks.</p>
       <a
