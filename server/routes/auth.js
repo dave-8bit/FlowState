@@ -29,14 +29,19 @@ if (!githubClientId || !githubClientSecret || !clientUrl || !jwtSecret) {
 
 router.get("/github", (req, res) => {
   try {
-    const redirectUri = `${clientUrl.replace(/\/$/, "")}/auth/github/callback`;
     const scope = encodeURIComponent("read:user user:email");
+
+    // GitHub must redirect back to the *backend* so the server callback can exchange
+    // the code for an access token and then issue our JWT.
+    const redirectUri = `${clientUrl.replace(/\/$/, "")}/auth/github/callback`;
+    const serverRedirectUri = `http://localhost:3000/auth/github/callback`;
 
     const authorizationUrl = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(
       githubClientId
     )}&redirect_uri=${encodeURIComponent(
-      redirectUri
+      serverRedirectUri
     )}&scope=${scope}`;
+
 
     res.redirect(302, authorizationUrl);
   } catch (err) {
@@ -141,6 +146,7 @@ router.get("/github/callback", async (req, res) => {
     const redirectUrl = `${clientUrl.replace(/\/$/, "")}/?token=${encodeURIComponent(
       token
     )}`;
+
 
     return res.redirect(302, redirectUrl);
   } catch (err) {
