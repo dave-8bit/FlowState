@@ -1,6 +1,7 @@
-const baseURL = 'http://localhost:3000'
-
 import { getToken } from '../features/auth/token.js'
+
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 
 async function postJSON(path, body) {
   const token = getToken()
