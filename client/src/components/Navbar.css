@@ -58,8 +58,16 @@
   font-size: 14px;
   padding: 10px 12px;
   border-radius: 12px;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease, border-color 160ms ease;
+  border: 1px solid transparent;
 }
+
+.navbar-link--active {
+  background: rgba(170, 59, 255, 0.18);
+  border-color: rgba(170, 59, 255, 0.5);
+  color: rgba(255, 255, 255, 1);
+}
+
 
 .navbar-link:hover {
   background: rgba(255, 255, 255, 0.12);

@@ -64,7 +64,9 @@ body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow-x: clip;
 }
+
 
 h1,
 h2 {

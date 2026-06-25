@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { clearToken, getToken, setToken } from '../features/auth/token.js'
 import './Navbar.css'
 
 function useAuthState() {
   const authed = useMemo(() => !!getToken(), [])
-
   const [isAuthed, setIsAuthed] = useState(authed)
 
   useEffect(() => {
@@ -17,7 +16,6 @@ function useAuthState() {
     return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-
   return isAuthed
 }
 
@@ -26,12 +24,12 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
 
+  // Close the mobile menu when route changes.
+  // To avoid eslint set-state-in-effect warnings, we only close when already open.
   useEffect(() => {
-    // Avoid setting state directly from an effect (eslint: set-state-in-effect).
-    // Keep menu state controlled by click/close handlers.
-  }, [location.pathname])
-
-
+    if (!menuOpen) return
+    setMenuOpen(false)
+  }, [location.pathname, menuOpen])
 
   const onLogout = () => {
     clearToken()
@@ -39,27 +37,31 @@ export default function Navbar() {
     setMenuOpen(false)
   }
 
-
-  const navLink = (to, label, onClick) => (
-    <Link
+  const navLink = (to, label) => (
+    <NavLink
       to={to}
-      className="navbar-link"
-      onClick={() => {
-        setMenuOpen(false)
-        onClick?.()
-      }}
+      end={to === '/'}
+      className={({ isActive }) =>
+        `navbar-link ${isActive ? 'navbar-link--active' : ''}`
+      }
+      onClick={() => setMenuOpen(false)}
     >
       {label}
-    </Link>
+    </NavLink>
   )
 
   return (
-    <header className="navbar">
+    <header className="navbar" role="banner">
       <div className="navbar-inner">
         <div className="navbar-brand" aria-label="FlowState">
-          <Link to="/" className="navbar-brand-link" onClick={() => setMenuOpen(false)}>
+          <NavLink
+            to="/"
+            end
+            className="navbar-brand-link"
+            onClick={() => setMenuOpen(false)}
+          >
             FlowState
-          </Link>
+          </NavLink>
         </div>
 
         <button
@@ -67,6 +69,7 @@ export default function Navbar() {
           className={`navbar-burger ${menuOpen ? 'navbar-burger--open' : ''}`}
           aria-label="Open navigation menu"
           aria-expanded={menuOpen}
+          aria-controls="primary-navigation"
           onClick={() => setMenuOpen((v) => !v)}
         >
           <span />
@@ -74,7 +77,11 @@ export default function Navbar() {
           <span />
         </button>
 
-        <nav className={`navbar-nav ${menuOpen ? 'navbar-nav--open' : ''}`}>
+        <nav
+          id="primary-navigation"
+          className={`navbar-nav ${menuOpen ? 'navbar-nav--open' : ''}`}
+          aria-label="Primary"
+        >
           <div className="navbar-links">
             {navLink('/', 'Home')}
             {navLink('/brain-dump', 'Brain Dump')}
@@ -101,4 +108,5 @@ export default function Navbar() {
     </header>
   )
 }
+
 
