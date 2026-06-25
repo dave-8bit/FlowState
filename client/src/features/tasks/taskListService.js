@@ -1,9 +1,10 @@
-import client from '../../api/client.js'
+import { getToken } from '../auth/token.js'
+import { baseURL } from '../../api/client.js'
 
 export async function fetchTasks() {
-  const token = window?.localStorage?.getItem('token')
+  const token = getToken()
 
-  const res = await fetch(`${client.baseURL}/api/tasks`, {
+  const res = await fetch(`${baseURL}/api/tasks`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -18,4 +19,5 @@ export async function fetchTasks() {
 
   return res.json()
 }
+
 
