@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+
+
 import { clearToken, getToken, setToken } from '../features/auth/token.js'
 import './Navbar.css'
 
@@ -22,14 +24,9 @@ function useAuthState() {
 export default function Navbar() {
   const authed = useAuthState()
   const [menuOpen, setMenuOpen] = useState(false)
-  const location = useLocation()
 
-  // Close the mobile menu when route changes.
-  // To avoid eslint set-state-in-effect warnings, we only close when already open.
-  useEffect(() => {
-    if (!menuOpen) return
-    setMenuOpen(false)
-  }, [location.pathname, menuOpen])
+
+
 
   const onLogout = () => {
     clearToken()
