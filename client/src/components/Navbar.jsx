@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { clearToken, getToken } from '../features/auth/token.js'
+import logoPng from '../assets/logo.png'
 import './Navbar.css'
-
 
 
 function useAuthState() {
@@ -63,7 +63,8 @@ export default function Navbar() {
             className="navbar-brand-link"
             onClick={() => setMenuOpen(false)}
           >
-            FlowState
+            <img className="navbar-logo" src={logoPng} alt="FlowState" />
+            <span className="navbar-brand-text">FlowState</span>
           </NavLink>
         </div>
 

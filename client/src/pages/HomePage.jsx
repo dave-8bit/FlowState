@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getToken } from '../features/auth/token.js'
-import logoPng from '../assets/logo.png'
 import './HomePage.css'
 
 
@@ -14,13 +13,6 @@ export default function HomePage() {
       <div className="container">
         <section className="hero" aria-label="Hero">
           <div>
-            <div className="badge" aria-label="Product badge">
-              <span className="badge-dot" aria-hidden="true" />
-              <img className="brandLogo" src={logoPng} alt="FlowState" />
-              <span className="brandName">FlowState</span>
-            </div>
-
-
             <h1 className="h-title">Turn ideas into organized work automatically.</h1>
 
             <p className="h-subtitle">

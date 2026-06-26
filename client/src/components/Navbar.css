@@ -25,11 +25,24 @@
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
   min-width: 160px;
 }
 
+.navbar-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.navbar-brand-text {
+  font-weight: 900;
+  line-height: 1;
+}
+
 .navbar-brand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 900;
   letter-spacing: 0.2px;
   color: rgba(255, 255, 255, 0.95);

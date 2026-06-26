@@ -24,9 +24,10 @@
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr);
-  gap: 3rem;
+  gap: 3.2rem;
   align-items: start;
 }
+
 
 @media (max-width: 767px) {
   .hero {
@@ -142,7 +143,39 @@ transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 .previewCard {
   min-width: 320px;
   width: 100%;
+  border-radius: 18px;
+  border: 1px solid var(--fs-accent-border);
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+  padding: 16px;
+  overflow: hidden;
 }
+
+/* internal spacing */
+.previewCard .previewTop,
+.previewCard .previewTitle,
+.previewCard .previewGrid,
+.previewCard .previewFooter {
+  box-sizing: border-box;
+}
+
+.previewTop {
+  margin-bottom: 12px;
+}
+
+.previewGrid {
+  gap: 12px;
+}
+
+.previewStat {
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+
+.previewFooter {
+  margin-top: 16px;
+}
+
 
 
 .previewTop {
@@ -150,8 +183,9 @@ transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
+
 
 .previewKicker {
   font-weight: 800;
@@ -178,9 +212,10 @@ transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
 
 .previewGrid {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   margin-top: 14px;
 }
+
 
 .previewStat {
   display: grid;
@@ -244,10 +279,11 @@ transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 16px;
   padding-top: 12px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 
 .previewFooterDot {
   width: 10px;
