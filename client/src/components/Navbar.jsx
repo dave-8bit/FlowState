@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
-import { clearToken, getToken, setToken } from '../features/auth/token.js'
+import { clearToken, getToken } from '../features/auth/token.js'
 import './Navbar.css'
+
 
 
 function useAuthState() {
@@ -28,11 +29,16 @@ export default function Navbar() {
 
 
 
+
+
+
   const onLogout = () => {
     clearToken()
-    setToken(null)
     setMenuOpen(false)
+    // keep auth state in sync immediately in this tab
+    window.dispatchEvent(new StorageEvent('storage', { key: 'token' }))
   }
+
 
   const navLink = (to, label) => (
     <NavLink
