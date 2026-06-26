@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
-
 import { clearToken, getToken, setToken } from '../features/auth/token.js'
 import './Navbar.css'
+
 
 function useAuthState() {
   const authed = useMemo(() => !!getToken(), [])
@@ -74,33 +74,35 @@ export default function Navbar() {
           <span />
         </button>
 
-        <nav
-          id="primary-navigation"
-          className={`navbar-nav ${menuOpen ? 'navbar-nav--open' : ''}`}
-          aria-label="Primary"
-        >
-          <div className="navbar-links">
-            {navLink('/', 'Home')}
-            {navLink('/brain-dump', 'Brain Dump')}
-            {navLink('/tasks', 'My Tasks')}
-          </div>
+        <div className="navbar-panel-wrapper">
+          <nav
+            id="primary-navigation"
+            className={`navbar-panel ${menuOpen ? 'navbar-panel--open' : ''}`}
+            aria-label="Primary"
+          >
+            <div className="navbar-links">
+              {navLink('/', 'Home')}
+              {navLink('/brain-dump', 'Brain Dump')}
+              {navLink('/tasks', 'My Tasks')}
+            </div>
 
-          <div className="navbar-actions">
-            {authed ? (
-              <button type="button" className="navbar-button" onClick={onLogout}>
-                Logout
-              </button>
-            ) : (
-              <a
-                className="navbar-button navbar-button--primary"
-                href="http://localhost:3000/auth/github"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login with GitHub
-              </a>
-            )}
-          </div>
-        </nav>
+            <div className="navbar-actions">
+              {authed ? (
+                <button type="button" className="navbar-button" onClick={onLogout}>
+                  Logout
+                </button>
+              ) : (
+                <a
+                  className="navbar-button navbar-button--primary"
+                  href="http://localhost:3000/auth/github"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Login with GitHub
+                </a>
+              )}
+            </div>
+          </nav>
+        </div>
       </div>
     </header>
   )
