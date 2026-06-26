@@ -197,8 +197,8 @@ export function useFocusSession() {
       if (prev.status !== 'paused') return prev
 
       const nowMs = getNowMs()
-      const durationMinutes = prev.durationMinutes
       const remainingSeconds = prev.remainingSeconds
+
 
       const remainingMs = remainingSeconds * 1000
       const endsAtMs = nowMs + remainingMs
@@ -229,13 +229,12 @@ export function useFocusSession() {
       return next
     })
 
-    if (session.sessionId) {
-      await closeSession({ sessionId: session.sessionId })
-    }
-  }, [session.sessionId])
+  }, [])
 
-  const complete = useCallback(async () => {
+
+  const complete = useCallback(() => {
     setSession((prev) => {
+
       if (!canTransition(prev.status, 'completed')) return prev
       const nowMs = getNowMs()
       const next = {
@@ -248,10 +247,8 @@ export function useFocusSession() {
       return next
     })
 
-    if (session.sessionId) {
-      await closeSession({ sessionId: session.sessionId })
-    }
-  }, [session.sessionId])
+  }, [])
+
 
   // When we auto-complete (timer reaches 0), call backend close exactly once.
   const lastTerminalRef = useRef(null)
@@ -266,11 +263,11 @@ export function useFocusSession() {
     lastTerminalRef.current = key
 
     // fire-and-forget with dev logging; UI handles already terminal state.
-    closeSession({ sessionId: session.sessionId }).catch((e) => {
-      // eslint-disable-next-line no-console
-      console.error('Focus session close failed', e)
+    closeSession({ sessionId: session.sessionId }).catch(() => {
+      // swallow; UI state is already terminal
     })
   }, [session.sessionId, session.status])
+
 
   const reset = useCallback(() => {
     lastTerminalRef.current = null
