@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 
 const { PrismaClient } = require("@prisma/client");
 
+const { getIO } = require("../socket");
+
 const router = express.Router();
 
 const prisma = new PrismaClient();
@@ -50,6 +52,9 @@ router.post("/tasks", async (req, res) => {
       where: { userId },
       data: { lastActiveAt: new Date() },
     });
+
+    const io = getIO();
+    if (io) io.to(`user:${userId}`).emit("task:created", { task });
 
     res.status(201).json(task);
   } catch (err) {
@@ -131,6 +136,9 @@ router.patch("/tasks/:id", async (req, res) => {
       });
     }
 
+    const io = getIO();
+    if (io) io.to(`user:${userId}`).emit("task:updated", { task: updatedTask });
+
     res.json(updatedTask);
   } catch (err) {
     res.status(500).json({ error: "Failed to update task" });
@@ -152,6 +160,9 @@ router.delete("/tasks/:id", async (req, res) => {
     if (!existingTask) return res.status(404).json({ error: "Task not found" });
 
     await prisma.task.delete({ where: { id } });
+
+    const io = getIO();
+    if (io) io.to(`user:${userId}`).emit("task:deleted", { taskId: id });
 
     if (existingTask.status !== "DONE") {
       await prisma.analytics.update({

@@ -1,12 +1,16 @@
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
 
+let ioInstance = null;
+
 const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
     cors: {
       origin: "*",
     },
   });
+
+  ioInstance = io;
 
   io.use((socket, next) => {
     const token = socket.handshake?.auth?.token;
@@ -25,6 +29,9 @@ const initSocket = (httpServer) => {
   });
 
   io.on("connection", (socket) => {
+    // join an authenticated per-user room for task sync
+    if (socket.user?.userId) socket.join(`user:${socket.user.userId}`);
+
     socket.on("join_session", ({ sessionId } = {}) => {
       if (!sessionId) return;
       socket.join(`session:${sessionId}`);
@@ -67,5 +74,9 @@ const initSocket = (httpServer) => {
   return io;
 };
 
-module.exports = { initSocket };
+function getIO() {
+  return ioInstance;
+}
+
+module.exports = { initSocket, getIO };
 

@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { fetchTasks } from '../features/tasks/taskListService.js'
 import { FocusSession } from '../features/focus/FocusSession.jsx'
+import { useSocket } from '../features/socket/useSocket.js'
+
 
 function priorityLabel(priority) {
   switch (priority) {
@@ -30,6 +32,62 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const socket = useSocket()
+
+  const handleTaskCreated = useCallback(
+    ({ task }) => {
+      try {
+        if (!task?.id) return
+        setTasks((prev) => {
+          const idx = prev.findIndex((t) => t.id === task.id)
+          if (idx === -1) return [...prev, task]
+          const next = [...prev]
+          next[idx] = task
+          return next
+        })
+      } catch (e) {
+        console.error(e)
+      }
+    },
+    [setTasks]
+  )
+
+  const handleTaskUpdated = useCallback(
+    ({ task }) => {
+      if (!task?.id) return
+      setTasks((prev) => {
+        const idx = prev.findIndex((t) => t.id === task.id)
+        if (idx === -1) return [...prev, task]
+        const next = [...prev]
+        next[idx] = task
+        return next
+      })
+    },
+    [setTasks]
+  )
+
+  const handleTaskDeleted = useCallback(
+    ({ taskId }) => {
+      if (!taskId) return
+      setTasks((prev) => prev.filter((t) => t.id !== taskId))
+    },
+    [setTasks]
+  )
+
+  useEffect(() => {
+    if (!socket) return
+
+    socket.subscribe('task:created', handleTaskCreated)
+    socket.subscribe('task:updated', handleTaskUpdated)
+    socket.subscribe('task:deleted', handleTaskDeleted)
+
+    return () => {
+      socket.unsubscribe('task:created', handleTaskCreated)
+      socket.unsubscribe('task:updated', handleTaskUpdated)
+      socket.unsubscribe('task:deleted', handleTaskDeleted)
+    }
+  }, [socket, handleTaskCreated, handleTaskUpdated, handleTaskDeleted])
 
   useEffect(() => {
     let cancelled = false
