@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { fetchTasks } from '../features/tasks/taskListService.js'
+import { FocusSession } from '../features/focus/FocusSession.jsx'
 
 function priorityLabel(priority) {
   switch (priority) {
@@ -94,7 +95,11 @@ export default function TasksPage() {
           {cards}
         </div>
       )}
+
+      {/* Focus Session foundation (timer + persistence) composed inside Tasks workflow */}
+      <FocusSession />
     </div>
   )
 }
+
 
