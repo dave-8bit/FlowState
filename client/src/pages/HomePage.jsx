@@ -18,8 +18,8 @@ export default function HomePage() {
               <span className="badge-dot" aria-hidden="true" />
               <img className="brandLogo" src={logoPng} alt="FlowState" />
               <span className="brandName">FlowState</span>
-
             </div>
+
 
             <h1 className="h-title">Turn ideas into organized work automatically.</h1>
 
@@ -42,7 +42,9 @@ export default function HomePage() {
             </div>
           </div>
 
+
           <aside className="previewCard" aria-label="Product preview">
+
             <div className="previewTop">
               <div className="previewKicker">Today</div>
               <div className="previewChip" aria-hidden="true">FlowState</div>
@@ -93,7 +95,8 @@ export default function HomePage() {
           <div className="featureGrid">
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true">🧠 Brain Dump AI</div>
+              <div className="icon" aria-hidden="true">🧠</div>
+
                 <div>
                   <h3 className="cardTitle">Brain Dump AI</h3>
                   <p className="cardDesc">Convert free-form thoughts into structured tasks you can act on.</p>
@@ -103,7 +106,8 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true">✓ Smart Task Organization</div>
+                <div className="icon" aria-hidden="true">✓</div>
+
                 <div>
                   <h3 className="cardTitle">Smart Task Organization</h3>
                   <p className="cardDesc">Group work logically and keep priorities clear as you go.</p>
@@ -113,7 +117,8 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true">⏱ Focus Sessions</div>
+                <div className="icon" aria-hidden="true">⏱</div>
+
                 <div>
                   <h3 className="cardTitle">Focus Sessions</h3>
                   <p className="cardDesc">Stay in the zone with sessions built for real world productivity.</p>
@@ -123,7 +128,8 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true">📈 Productivity Analytics</div>
+                <div className="icon" aria-hidden="true">📈</div>
+
                 <div>
                   <h3 className="cardTitle">Productivity Analytics</h3>
                   <p className="cardDesc">See what works and improve your workflow over time.</p>
