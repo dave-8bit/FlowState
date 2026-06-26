@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { getToken } from '../features/auth/token.js'
 import './HomePage.css'
+
 
 export default function HomePage() {
   const authed = useMemo(() => !!getToken(), [])
@@ -15,7 +17,7 @@ export default function HomePage() {
               FlowState
             </div>
 
-            <h1 className="h-title">Turn ideas into organized work—automatically.</h1>
+            <h1 className="h-title">Turn ideas into organized work automatically.</h1>
             <p className="h-subtitle">
               Brain Dump to smart tasks in seconds. Capture what’s on your mind, organize it with AI,
               and stay focused through structured sessions.
@@ -23,14 +25,15 @@ export default function HomePage() {
 
             <div className="hero-ctaRow" aria-label="Primary call to action">
               {authed ? (
-                <a className="cta cta--primary" href="/brain-dump">
+                <Link className="cta cta--primary" to="/brain-dump">
                   Start Brain Dump
-                </a>
+                </Link>
               ) : (
                 <a className="cta cta--primary" href="http://localhost:3000/auth/github">
                   Login with GitHub
                 </a>
               )}
+
             </div>
           </div>
 
@@ -69,7 +72,7 @@ export default function HomePage() {
                 <div className="icon" aria-hidden="true" />
                 <div>
                   <h3 className="cardTitle">Focus Sessions</h3>
-                  <p className="cardDesc">Stay in the zone with sessions built for real-world productivity.</p>
+                  <p className="cardDesc">Stay in the zone with sessions built for real world productivity.</p>
                 </div>
               </div>
             </article>
@@ -98,14 +101,15 @@ export default function HomePage() {
 
             <div className="finalCtaActions">
               {authed ? (
-                <a className="cta cta--primary" href="/brain-dump">
+                <Link className="cta cta--primary" to="/brain-dump">
                   Start Brain Dump
-                </a>
+                </Link>
               ) : (
                 <a className="cta cta--primary" href="http://localhost:3000/auth/github">
                   Login with GitHub
                 </a>
               )}
+
             </div>
           </div>
         </section>
