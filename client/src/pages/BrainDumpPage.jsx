@@ -56,7 +56,7 @@ export default function BrainDumpPage() {
           </button>
         </div>
 
-        {error ? <div className="brainDumpError">{String(error?.message ?? error)}</div> : null}
+        {error ? <div className="brainDumpError">Unable to generate tasks right now. Please try again.</div> : null}
       </div>
 
       <div className="brainDumpResults">
@@ -80,7 +80,7 @@ export default function BrainDumpPage() {
             </div>
 
             {saveError ? (
-              <div className="brainDumpError">{String(saveError?.message ?? saveError)}</div>
+              <div className="brainDumpError">Unable to save your changes. Please try again.</div>
             ) : null}
             {saveSuccess ? <div className="brainDumpError" style={{ color: '#16a34a' }}>Saved!</div> : null}
 

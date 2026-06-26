@@ -33,6 +33,8 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+
+
   const socket = useSocket()
 
   const handleTaskCreated = useCallback(
@@ -142,7 +144,7 @@ export default function TasksPage() {
       {loading && <div>Loading tasks…</div>}
       {error && (
         <div style={{ color: 'crimson' }}>
-          Error loading tasks: {error?.message || String(error)}
+          Something went wrong.
         </div>
       )}
 
