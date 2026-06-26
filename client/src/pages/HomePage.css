@@ -11,8 +11,9 @@
 .home {
   width: 100%;
   box-sizing: border-box;
-  padding: 28px 16px 56px;
+  padding: 36px 16px 64px;
 }
+
 
 .container {
   width: 100%;
@@ -22,14 +23,17 @@
 
 .hero {
   display: grid;
-  gap: 18px;
+  gap: 22px;
   align-items: start;
 }
+
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
+
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -44,10 +48,22 @@
   height: 10px;
   border-radius: 999px;
   background: var(--fs-accent);
-  box-shadow: 0 0 0 4px rgba(170, 59, 255, 0.18);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.10);
 }
 
+.brandLogo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.brandName {
+  font-weight: 700;
+}
+
+
 .h-title {
+
   margin: 0;
   font-size: 40px;
   line-height: 1.08;
@@ -79,17 +95,18 @@
   font-weight: 800;
   font-size: 14px;
   text-decoration: none;
-  transition: transform 140ms ease, background 140ms ease, border-color 140ms ease;
+transition: background 140ms ease, border-color 140ms ease;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .cta:hover {
-  transform: translateY(-1px);
   background: rgba(255, 255, 255, 0.10);
   border-color: rgba(255, 255, 255, 0.20);
 }
+
 
 .cta--primary {
   border-color: var(--fs-accent-border);
@@ -97,8 +114,12 @@
 }
 
 .cta--primary:hover {
-  background: rgba(170, 59, 255, 0.20);
+  background: var(--fs-accent-bg);
+  border-color: var(--fs-accent-border);
+  color: var(--text-h);
 }
+
+
 
 .section {
   margin-top: 34px;
@@ -149,6 +170,8 @@
 
 .icon {
   width: 42px;
+  flex: 0 0 auto;
+
   height: 42px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
@@ -158,11 +181,15 @@
   justify-content: center;
   color: var(--text-h);
   font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  overflow: hidden;
 }
 
-.icon::before {
-  content: '◎';
-}
+
+/* icons are provided via emoji in markup */
+
 
 .cardTitle {
   margin: 0;
@@ -212,11 +239,38 @@
   flex-wrap: wrap;
 }
 
+.socialProof {
+  margin-top: 16px;
+  padding: 10px 0 0;
+}
+
+.socialProofInner {
+  width: 100%;
+
+  max-width: 1080px;
+  margin: 0 auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 13px;
+  letter-spacing: 0.1px;
+}
+
+
 /* Responsive */
 @media (min-width: 768px) {
-  .home {
-    padding: 40px 20px 68px;
+  .brandLogo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
   }
+
+
+
+  .home {
+    padding: 48px 20px 72px;
+  }
+
+
 
   .hero {
     grid-template-columns: 1.2fr 0.8fr;
@@ -265,5 +319,6 @@
   .cta:hover {
     transform: none;
   }
+
 }
 

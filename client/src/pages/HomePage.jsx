@@ -1,10 +1,12 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { getToken } from '../features/auth/token.js'
+import logoPng from '../assets/logo.png'
 import './HomePage.css'
 
 
 export default function HomePage() {
+
   const authed = useMemo(() => !!getToken(), [])
 
   return (
@@ -14,10 +16,13 @@ export default function HomePage() {
           <div>
             <div className="badge" aria-label="Product badge">
               <span className="badge-dot" aria-hidden="true" />
-              FlowState
+              <img className="brandLogo" src={logoPng} alt="FlowState" />
+              <span className="brandName">FlowState</span>
+
             </div>
 
             <h1 className="h-title">Turn ideas into organized work automatically.</h1>
+
             <p className="h-subtitle">
               Brain Dump to smart tasks in seconds. Capture what’s on your mind, organize it with AI,
               and stay focused through structured sessions.
@@ -37,8 +42,47 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div aria-hidden="true" />
+          <aside className="previewCard" aria-label="Product preview">
+            <div className="previewTop">
+              <div className="previewKicker">Today</div>
+              <div className="previewChip" aria-hidden="true">FlowState</div>
+            </div>
+
+            <div className="previewTitle">Today's Tasks</div>
+
+            <div className="previewGrid" aria-label="Preview items">
+              <div className="previewStat">
+                <div className="previewStatLabel">AI Generated Tasks</div>
+                <div className="previewStatValue">7</div>
+                <div className="previewStatBar" aria-hidden="true" />
+              </div>
+
+              <div className="previewStat">
+                <div className="previewStatLabel">Ready to Focus</div>
+                <div className="previewStatValue">3</div>
+                <div className="previewStatBar previewStatBar--alt" aria-hidden="true" />
+              </div>
+
+              <div className="previewStat previewStat--wide">
+                <div className="previewStatLabel">Productivity Summary</div>
+                <div className="previewStatValue previewStatValue--summary">Consistent momentum</div>
+              </div>
+            </div>
+
+            <div className="previewFooter">
+              <span className="previewFooterDot" aria-hidden="true" />
+              <span className="previewFooterText">Brain Dump → tasks → focus sessions</span>
+            </div>
+          </aside>
+
         </section>
+
+        <div className="socialProof" aria-label="Social proof">
+          <div className="socialProofInner">
+            Built for Developers • Students • Professionals
+          </div>
+        </div>
+
 
         <section className="section" aria-label="Features">
           <div className="sectionTitleRow">
@@ -49,7 +93,7 @@ export default function HomePage() {
           <div className="featureGrid">
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true" />
+                <div className="icon" aria-hidden="true">🧠 Brain Dump AI</div>
                 <div>
                   <h3 className="cardTitle">Brain Dump AI</h3>
                   <p className="cardDesc">Convert free-form thoughts into structured tasks you can act on.</p>
@@ -59,7 +103,7 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true" />
+                <div className="icon" aria-hidden="true">✓ Smart Task Organization</div>
                 <div>
                   <h3 className="cardTitle">Smart Task Organization</h3>
                   <p className="cardDesc">Group work logically and keep priorities clear as you go.</p>
@@ -69,7 +113,7 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true" />
+                <div className="icon" aria-hidden="true">⏱ Focus Sessions</div>
                 <div>
                   <h3 className="cardTitle">Focus Sessions</h3>
                   <p className="cardDesc">Stay in the zone with sessions built for real world productivity.</p>
@@ -79,13 +123,14 @@ export default function HomePage() {
 
             <article className="card">
               <div className="cardInner">
-                <div className="icon" aria-hidden="true" />
+                <div className="icon" aria-hidden="true">📈 Productivity Analytics</div>
                 <div>
                   <h3 className="cardTitle">Productivity Analytics</h3>
                   <p className="cardDesc">See what works and improve your workflow over time.</p>
                 </div>
               </div>
             </article>
+
           </div>
         </section>
 
