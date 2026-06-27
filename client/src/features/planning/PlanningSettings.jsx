@@ -2,7 +2,10 @@ import { useMemo } from 'react'
 
 import { usePlanningSettings } from './usePlanningSettings.js'
 
+
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+
 
 function ToggleDay({ day, checked, onChange }) {
   return (
@@ -15,6 +18,10 @@ function ToggleDay({ day, checked, onChange }) {
 
 export default function PlanningSettings() {
   const { settings, setField, validationErrors, reset } = usePlanningSettings()
+
+
+
+
 
   const selectedDays = useMemo(() => {
     const v = settings.workingDays
