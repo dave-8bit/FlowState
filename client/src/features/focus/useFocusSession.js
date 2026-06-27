@@ -1,8 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useSocket } from '../socket/useSocket.js'
+
+
+
+
+
+
 import { closeSession, startSession } from './focusApi.js'
 import { clearFocusSession, loadFocusSession, saveFocusSession } from './focusStorage.js'
 import { computeRemainingSeconds } from './focusTimer.js'
+
 
 const PRESET_DURATIONS_MINUTES = [25, 50, 90]
 
@@ -83,6 +91,7 @@ export function useFocusSession() {
     saveFocusSession(next)
   }, [])
 
+
   const stopInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
@@ -90,10 +99,86 @@ export function useFocusSession() {
     }
   }, [])
 
+
+  const upsertFromServerStartedRef = useRef(null)
+
+  const { subscribe, unsubscribe } = useSocket()
+
   useEffect(() => {
-    // keep persistence fresh if running/paused/completed/cancelled
-    // but avoid excessive writes per tick: remainingSeconds is updated frequently.
-  }, [])
+    // Socket synchronization: server is source of truth for endsAt/started/completed.
+    // Prevent duplicate listeners by subscribing once for each handler.
+
+    const handleStarted = (payload) => {
+
+
+
+
+      if (!payload?.sessionId) return
+
+      const endsAtMs = payload.endsAt ? Date.parse(payload.endsAt) : null
+      if (!Number.isFinite(endsAtMs)) return
+
+      const startedAtMs = payload.startedAt ? Date.parse(payload.startedAt) : null
+      if (!Number.isFinite(startedAtMs)) return
+
+      const startedKey = `${payload.sessionId}:${payload.startedAt}`
+      if (upsertFromServerStartedRef.current === startedKey) return
+      upsertFromServerStartedRef.current = startedKey
+
+      const nowMs = getNowMs()
+      const remainingSeconds = computeRemainingSeconds({ endsAtMs, nowMs })
+
+      setSession((prev) => {
+        if (prev.sessionId !== payload.sessionId) {
+          // allow reconcile even if local state is stale
+        }
+
+        const status = 'running'
+        const next = {
+          ...prev,
+          sessionId: payload.sessionId,
+          taskId: payload.taskId ?? null,
+          durationMinutes: payload.timerMinutes ?? null,
+          startsAtMs: startedAtMs,
+          endsAtMs,
+          remainingSeconds,
+          status,
+          lastUpdatedAtMs: nowMs,
+        }
+        saveFocusSession(next)
+        return next
+      })
+    }
+
+    const handleCompleted = (payload) => {
+      if (!payload?.sessionId) return
+      setSession((prev) => {
+        if (prev.sessionId && prev.sessionId !== payload.sessionId) {
+          // ignore other sessions
+        }
+
+        const nowMs = getNowMs()
+        const next = {
+          ...prev,
+          sessionId: payload.sessionId,
+          status: 'completed',
+          remainingSeconds: 0,
+          lastUpdatedAtMs: nowMs,
+        }
+        saveFocusSession(next)
+        return next
+      })
+    }
+
+    subscribe('focus:started', handleStarted)
+    subscribe('focus:completed', handleCompleted)
+
+    return () => {
+      unsubscribe('focus:started', handleStarted)
+      unsubscribe('focus:completed', handleCompleted)
+    }
+  }, [subscribe, unsubscribe])
+
 
   useEffect(() => {
     stopInterval()
