@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { fetchTasks } from '../features/tasks/taskListService.js'
 import { FocusSession } from '../features/focus/FocusSession.jsx'
 import { useSocket } from '../features/socket/useSocket.js'
+import PlanningSettings from '../features/planning/PlanningSettings.jsx'
+
 
 
 function priorityLabel(priority) {
@@ -158,8 +160,11 @@ export default function TasksPage() {
 
       {/* Focus Session foundation (timer + persistence) composed inside Tasks workflow */}
       <FocusSession />
+
+      <PlanningSettings />
     </div>
   )
 }
+
 
 
