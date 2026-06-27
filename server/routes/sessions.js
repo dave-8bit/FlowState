@@ -1,30 +1,13 @@
 const express = require("express");
 
 const { PrismaClient } = require("@prisma/client");
-const jwt = require("jsonwebtoken");
+
+const { getIO } = require("../socket");
+const { authenticateToken } = require("../middleware/authenticateToken");
 
 const router = express.Router();
 
 const prisma = new PrismaClient();
-
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ error: "Unauthorized" });
-
-  const [scheme, token] = authHeader.split(" ");
-  if (scheme !== "Bearer" || !token) return res.status(401).json({ error: "Unauthorized" });
-
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) return res.status(500).json({ error: "Server misconfigured" });
-
-  try {
-    const decoded = jwt.verify(token, jwtSecret);
-    req.user = decoded;
-    return next();
-  } catch {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-};
 
 router.use(authenticateToken);
 
@@ -49,6 +32,21 @@ router.post("/sessions", async (req, res) => {
         participants: true,
       },
     });
+
+    const io = getIO();
+    if (io) {
+      const startedAt = new Date();
+      const endsAt = new Date(startedAt.getTime() + Number(timerMinutes) * 60 * 1000);
+
+      io.to(`user:${creatorId}`).emit("focus:started", {
+        sessionId: session.id,
+        taskId: null,
+        timerMinutes: session.timerMinutes,
+        status: "running",
+        startedAt: startedAt.toISOString(),
+        endsAt: endsAt.toISOString(),
+      });
+    }
 
     res.status(201).json(session);
   } catch {
@@ -131,6 +129,15 @@ router.patch("/sessions/:id/close", async (req, res) => {
       where: { id },
       data: { isActive: false },
     });
+
+    const io = getIO();
+    if (io) {
+      io.to(`user:${userId}`).emit("focus:completed", {
+        sessionId: updated.id,
+        status: "completed",
+        completedAt: new Date().toISOString(),
+      });
+    }
 
     res.json(updated);
   } catch {

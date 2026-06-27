@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useSocket } from '../socket/useSocket.js'
 
 import { closeSession, startSession } from './focusApi.js'
 import { clearFocusSession, loadFocusSession, saveFocusSession } from './focusStorage.js'
@@ -78,7 +79,9 @@ export function useFocusSession() {
   })
 
   const intervalRef = useRef(null)
+  const lastSocketStartedRef = useRef(null)
 
+  const { subscribe, unsubscribe } = useSocket()
 
   const persist = useCallback((next) => {
     setSession(next)
@@ -92,11 +95,7 @@ export function useFocusSession() {
     }
   }, [])
 
-  useEffect(() => {
-    // keep persistence fresh if running/paused/completed/cancelled
-    // but avoid excessive writes per tick: remainingSeconds is updated frequently.
-  }, [])
-
+  // Timer tick for local countdown.
   useEffect(() => {
     stopInterval()
 
@@ -124,8 +123,6 @@ export function useFocusSession() {
             remainingSeconds,
             lastUpdatedAtMs: nowMs,
           }
-          // Reduce write frequency: still ok to persist on tick due to small state.
-          // If needed later, we can debounce.
           saveFocusSession(next)
           return next
         })
@@ -137,13 +134,76 @@ export function useFocusSession() {
     }
   }, [session.status, session.endsAtMs, stopInterval])
 
-  // Persist a stable derived state on terminal states
+  // Persist terminal state.
   useEffect(() => {
     if (session.status === 'completed' || session.status === 'cancelled') {
       saveFocusSession(session)
       stopInterval()
     }
   }, [session.status, session, stopInterval])
+
+  const applyFromSocketStarted = useCallback(
+    (payload) => {
+      if (!payload?.sessionId) return
+
+      // Avoid loops/reprocessing the same started event.
+      const key = `${payload.sessionId}:${payload.startedAt}`
+      if (lastSocketStartedRef.current === key) return
+      lastSocketStartedRef.current = key
+
+      const endsAtMs = payload.endsAt ? Date.parse(payload.endsAt) : null
+      const startedAtMs = payload.startedAt ? Date.parse(payload.startedAt) : null
+
+      if (!Number.isFinite(endsAtMs) || !Number.isFinite(startedAtMs)) return
+
+      const nowMs = getNowMs()
+      const remainingSeconds = computeRemainingSeconds({ endsAtMs, nowMs })
+
+      persist({
+        ...session,
+        sessionId: payload.sessionId,
+        taskId: payload.taskId ?? null,
+        durationMinutes: payload.timerMinutes ?? null,
+        startsAtMs: startedAtMs,
+        endsAtMs,
+        remainingSeconds,
+        status: 'running',
+        lastUpdatedAtMs: nowMs,
+      })
+    },
+    [persist, session]
+  )
+
+  const applyFromSocketCompleted = useCallback(
+    (payload) => {
+      if (!payload?.sessionId) return
+      const nowMs = getNowMs()
+
+      setSession((prev) => {
+        const next = {
+          ...prev,
+          sessionId: payload.sessionId,
+          status: 'completed',
+          remainingSeconds: 0,
+          lastUpdatedAtMs: nowMs,
+        }
+        saveFocusSession(next)
+        return next
+      })
+    },
+    []
+  )
+
+  // Socket-driven synchronization (no refetch).
+  useEffect(() => {
+    subscribe('focus:started', applyFromSocketStarted)
+    subscribe('focus:completed', applyFromSocketCompleted)
+
+    return () => {
+      unsubscribe('focus:started', applyFromSocketStarted)
+      unsubscribe('focus:completed', applyFromSocketCompleted)
+    }
+  }, [applyFromSocketCompleted, applyFromSocketStarted, subscribe, unsubscribe])
 
   const start = useCallback(
     async ({ durationMinutes, taskId }) => {
@@ -199,7 +259,6 @@ export function useFocusSession() {
       const nowMs = getNowMs()
       const remainingSeconds = prev.remainingSeconds
 
-
       const remainingMs = remainingSeconds * 1000
       const endsAtMs = nowMs + remainingMs
 
@@ -228,13 +287,10 @@ export function useFocusSession() {
       saveFocusSession(next)
       return next
     })
-
   }, [])
-
 
   const complete = useCallback(() => {
     setSession((prev) => {
-
       if (!canTransition(prev.status, 'completed')) return prev
       const nowMs = getNowMs()
       const next = {
@@ -246,31 +302,27 @@ export function useFocusSession() {
       saveFocusSession(next)
       return next
     })
-
   }, [])
-
 
   // When we auto-complete (timer reaches 0), call backend close exactly once.
   const lastTerminalRef = useRef(null)
   useEffect(() => {
     const terminal = session.status === 'completed' || session.status === 'cancelled'
     if (!terminal) return
-
     if (!session.sessionId) return
 
     const key = `${session.sessionId}:${session.status}`
     if (lastTerminalRef.current === key) return
     lastTerminalRef.current = key
 
-    // fire-and-forget with dev logging; UI handles already terminal state.
     closeSession({ sessionId: session.sessionId }).catch(() => {
       // swallow; UI state is already terminal
     })
   }, [session.sessionId, session.status])
 
-
   const reset = useCallback(() => {
     lastTerminalRef.current = null
+    lastSocketStartedRef.current = null
     stopInterval()
     clearFocusSession()
     setSession(initialState)
