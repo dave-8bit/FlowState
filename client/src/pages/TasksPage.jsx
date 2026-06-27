@@ -3,6 +3,10 @@ import { fetchTasks } from '../features/tasks/taskListService.js'
 import { FocusSession } from '../features/focus/FocusSession.jsx'
 import { useSocket } from '../features/socket/useSocket.js'
 import PlanningSettings from '../features/planning/PlanningSettings.jsx'
+import PlanningSummary from '../features/planning/PlanningSummary.jsx'
+import { usePlanningSettings } from '../features/planning/usePlanningSettings.js'
+import { calculatePlanningFeasibility } from '../features/planning/planningFeasibility.js'
+
 
 
 
@@ -35,7 +39,7 @@ export default function TasksPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-
+  const { settings: planningSettings, setField, validationErrors, reset } = usePlanningSettings()
 
   const socket = useSocket()
 
@@ -139,6 +143,14 @@ export default function TasksPage() {
     })
   }, [tasks])
 
+  const planningFeasibility = useMemo(() => {
+    return calculatePlanningFeasibility({
+      tasks,
+      planningSettings: planningSettings,
+    })
+  }, [tasks, planningSettings])
+
+
   return (
     <div style={{ padding: 24 }}>
       <h1 style={{ marginTop: 0 }}>Task Dashboard</h1>
@@ -161,10 +173,20 @@ export default function TasksPage() {
       {/* Focus Session foundation (timer + persistence) composed inside Tasks workflow */}
       <FocusSession />
 
-      <PlanningSettings />
+      <PlanningSettings
+        settings={planningSettings}
+        setField={setField}
+        validationErrors={validationErrors}
+        reset={reset}
+      />
+      <PlanningSummary planningState={planningFeasibility} />
     </div>
   )
 }
+
+
+
+
 
 
 
