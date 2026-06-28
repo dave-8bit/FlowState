@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { fetchTasks } from '../features/tasks/taskListService.js'
 import { FocusSession } from '../features/focus/FocusSession.jsx'
+import { useFocusSession } from '../features/focus/useFocusSession.js'
+
 import { useSocket } from '../features/socket/useSocket.js'
+
 import PlanningSettings from '../features/planning/PlanningSettings.jsx'
 import PlanningSummary from '../features/planning/PlanningSummary.jsx'
 import { usePlanningSettings } from '../features/planning/usePlanningSettings.js'
@@ -37,6 +40,9 @@ function formatDeadline(deadline) {
 }
 
 export default function TasksPage() {
+  const { actions } = useFocusSession()
+
+
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -159,6 +165,14 @@ export default function TasksPage() {
     })
   }, [tasks, planningSettings])
 
+  const onStartFocus = useCallback(
+    (taskId, durationMinutes) => {
+      actions.start({ durationMinutes, taskId })
+    },
+    [actions]
+  )
+
+
   return (
     <div style={{ padding: 24 }}>
       <h1 style={{ marginTop: 0 }}>Task Dashboard</h1>
@@ -187,7 +201,11 @@ export default function TasksPage() {
         validationErrors={validationErrors}
         reset={reset}
       />
-      <PlanningSummary planningState={planningFeasibility} planningSchedule={planningSchedule} />
+      <PlanningSummary
+        planningState={planningFeasibility}
+        planningSchedule={planningSchedule}
+        onStartFocus={onStartFocus}
+      />
     </div>
   )
 }
