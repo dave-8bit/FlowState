@@ -6,6 +6,8 @@ import PlanningSettings from '../features/planning/PlanningSettings.jsx'
 import PlanningSummary from '../features/planning/PlanningSummary.jsx'
 import { usePlanningSettings } from '../features/planning/usePlanningSettings.js'
 import { calculatePlanningFeasibility } from '../features/planning/planningFeasibility.js'
+import { generatePlanningSchedule } from '../features/planning/planningScheduler.js'
+
 
 
 
@@ -150,6 +152,12 @@ export default function TasksPage() {
     })
   }, [tasks, planningSettings])
 
+  const planningSchedule = useMemo(() => {
+    return generatePlanningSchedule({
+      tasks,
+      planningSettings,
+    })
+  }, [tasks, planningSettings])
 
   return (
     <div style={{ padding: 24 }}>
@@ -179,7 +187,7 @@ export default function TasksPage() {
         validationErrors={validationErrors}
         reset={reset}
       />
-      <PlanningSummary planningState={planningFeasibility} />
+      <PlanningSummary planningState={planningFeasibility} planningSchedule={planningSchedule} />
     </div>
   )
 }
