@@ -10,6 +10,8 @@ import PlanningSummary from '../features/planning/PlanningSummary.jsx'
 import { usePlanningSettings } from '../features/planning/usePlanningSettings.js'
 import { calculatePlanningFeasibility } from '../features/planning/planningFeasibility.js'
 import { generatePlanningSchedule } from '../features/planning/planningScheduler.js'
+import { prioritizeTasks } from '../features/planning/planningPrioritization.js'
+
 
 
 
@@ -159,11 +161,14 @@ export default function TasksPage() {
   }, [tasks, planningSettings])
 
   const planningSchedule = useMemo(() => {
+    const prioritizedTasks = prioritizeTasks({ tasks, planningSettings })
+
     return generatePlanningSchedule({
-      tasks,
+      tasks: prioritizedTasks,
       planningSettings,
     })
   }, [tasks, planningSettings])
+
 
   const onStartFocus = useCallback(
     (taskId, durationMinutes) => {
