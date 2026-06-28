@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 
 import RoadmapTimeline from './RoadmapTimeline.jsx'
 
-export default function PlanningSummary({ planningState, planningSchedule, tasks }) {
+export default function PlanningSummary({ planningState, planningSchedule, tasks, onStartFocus }) {
   const { state, statusMessage, summary } = planningState || {}
 
 
@@ -56,6 +56,7 @@ export default function PlanningSummary({ planningState, planningSchedule, tasks
       </div>
 
       {statusMessage ? (
+
         <div
           role="status"
           style={{
@@ -75,9 +76,14 @@ export default function PlanningSummary({ planningState, planningSchedule, tasks
         </div>
       ) : null}
 
-      <RoadmapTimeline planningSchedule={planningSchedule} tasks={tasks} />
+      <RoadmapTimeline
+        planningSchedule={planningSchedule}
+        tasks={tasks}
+        onStartFocus={onStartFocus}
+      />
 
     </div>
+
   )
 }
 

@@ -1,6 +1,7 @@
-export default function RoadmapTimeline({ planningSchedule, tasks }) {
+export default function RoadmapTimeline({ planningSchedule, tasks, onStartFocus }) {
   const schedule = planningSchedule?.schedule || []
   const unscheduledTaskIds = planningSchedule?.unscheduledTasks || []
+
 
   const tasksById = (Array.isArray(tasks) ? tasks : []).reduce((acc, t) => {
     if (t?.id) acc[t.id] = t
@@ -100,7 +101,25 @@ export default function RoadmapTimeline({ planningSchedule, tasks }) {
                             Session {s.order}
                           </div>
                         </div>
-                        <div style={{ fontWeight: 900 }}>{s.durationMinutes} min</div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+                          <div style={{ fontWeight: 900 }}>{s.durationMinutes} min</div>
+                          <button
+                            type="button"
+                            onClick={() => onStartFocus?.(s.taskId, s.durationMinutes)}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: 12,
+                              border: '1px solid rgba(0,0,0,0.1)',
+                              background: '#111827',
+                              color: 'white',
+                              cursor: 'pointer',
+                              fontWeight: 800,
+                            }}
+                          >
+                            Start Focus
+                          </button>
+                        </div>
+
                       </div>
                     )
                   })}
