@@ -105,8 +105,10 @@ export default function RoadmapTimeline({
 
                 <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
                   {sessions.map((s) => {
-                    const title = s.title || tasksById?.[s.taskId]?.title || `Task ${s.taskId || ''}`
+                    const title =
+                      s.title || tasksById?.[s.taskId]?.title || 'Untitled Task'
                     return (
+
                       <div
                         key={`${day.date}-${s.taskId}-${s.order}`}
                         style={{
@@ -187,9 +189,10 @@ export default function RoadmapTimeline({
                 >
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {t?.title || `Task ${taskId}`}
+                      {t?.title || tasksById?.[taskId]?.title || 'Untitled Task'}
+
                     </div>
-                    <div style={{ fontSize: 12, color: '#666' }}>Task ID: {taskId}</div>
+                    <div style={{ fontSize: 12, color: '#666' }}>Task</div>
                   </div>
                   <div style={{ fontWeight: 900 }}>{Number.isFinite(Number(remainingMinutes)) ? remainingMinutes : ''} min</div>
                 </div>

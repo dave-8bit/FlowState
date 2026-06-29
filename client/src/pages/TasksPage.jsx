@@ -166,7 +166,7 @@ export default function TasksPage() {
     })
   }, [tasks, planningSettings])
 
-  const [completedTaskIds, setCompletedTaskIds] = useState(() => new Set())
+  const [completedBlockIds, setCompletedBlockIds] = useState(() => new Set())
 
   useEffect(() => {
     let cancelled = false
@@ -176,7 +176,7 @@ export default function TasksPage() {
         const sessions = await fetchSessions({ includeCompleted: true })
         if (cancelled) return
 
-        const ids = new Set()
+        const completedIds = new Set()
         const completedSessions = Array.isArray(sessions) ? sessions : []
 
         for (const s of completedSessions) {
@@ -186,13 +186,13 @@ export default function TasksPage() {
 
           const participants = Array.isArray(s?.participants) ? s.participants : []
           for (const p of participants) {
-            const taskId = p?.taskId
-            if (taskId) ids.add(taskId)
+            const blockId = p?.blockId
+            // Backward compatibility: ignore legacy completed participants without blockId.
+            if (blockId) completedIds.add(blockId)
           }
         }
 
-
-        setCompletedTaskIds(ids)
+        setCompletedBlockIds(completedIds)
       } catch (e) {
         // if sessions fail, treat as nothing completed
         void e
@@ -208,19 +208,23 @@ export default function TasksPage() {
   const progress = useMemo(() => {
     const schedule = planningSchedule?.schedule || []
 
-    const focusBlocks = []
+    const roadmapBlocks = []
     for (const day of schedule) {
       const sessions = day?.sessions || []
       for (const s of sessions) {
-        if (s?.taskId) {
-          focusBlocks.push({ taskId: s.taskId, order: s.order, durationMinutes: s.durationMinutes })
+        if (s?.blockId) {
+          roadmapBlocks.push({
+            blockId: s.blockId,
+            order: s.order,
+            durationMinutes: s.durationMinutes,
+          })
         }
       }
     }
 
-    const completedBlocks = focusBlocks.filter((b) => completedTaskIds.has(b.taskId))
-    const remainingBlocks = focusBlocks.filter((b) => !completedTaskIds.has(b.taskId))
-    const total = focusBlocks.length
+    const completedBlocks = roadmapBlocks.filter((b) => completedBlockIds.has(b.blockId))
+    const remainingBlocks = roadmapBlocks.filter((b) => !completedBlockIds.has(b.blockId))
+    const total = roadmapBlocks.length
 
     const percentComplete = total > 0 ? (completedBlocks.length / total) * 100 : 0
     const activeBlock = remainingBlocks[0] || null
@@ -231,7 +235,7 @@ export default function TasksPage() {
       activeBlock,
       percentComplete,
     }
-  }, [planningSchedule, completedTaskIds])
+  }, [planningSchedule, completedBlockIds])
 
 
   const onStartFocus = useCallback(
@@ -242,6 +246,7 @@ export default function TasksPage() {
   )
 
   return (
+
     <div style={{ padding: 24 }}>
       <h1 style={{ marginTop: 0 }}>Task Dashboard</h1>
 
