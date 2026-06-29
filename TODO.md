@@ -1,25 +1,18 @@
 # TODO
 
-## Tracking
-- [ ] Milestone 4.4A: Roadmap Progress Tracking (true overall from persisted completed sessions)
+## Milestone 4.2B
+- [x] Keep Start Focus button inside RoadmapTimeline.
+- [x] Run `npm run lint` and `npm run build`.
 
-### Current status
-- Server updated: `GET /api/sessions?includeCompleted=true` returns active+completed sessions (completed sessions include participants for task mapping).
-- Client not yet implemented.
+## Milestone 4.4A — Client-Side Roadmap Progress Tracking
+### Backend
+- [x] Update `GET /api/sessions?includeCompleted=true` to return active+completed sessions (participants included). (server/routes/sessions.js)
 
-### Next steps (client)
-1. Add client API to fetch sessions history with `includeCompleted=true`.
-2. In `TasksPage.jsx`, fetch completed sessions history (authenticated) and derive roadmap progress derived value:
-   - completed taskIds from completed sessions participants.taskId
-   - completed minutes from planned blocks whose taskId is in completed set
-   - per-day completed/remaining counts derived from `planningSchedule`.
-3. Pass derived progress props down:
-   - `PlanningSummary -> RoadmapTimeline`.
-4. Update `RoadmapTimeline.jsx` to render progress indicators without owning logic.
-5. Run:
-   - `npm --prefix client run lint`
-   - `npm --prefix client run build`
-
-### Next steps (server)
-- Verify route file syntax and runtime behavior.
+### Client (remaining scope)
+- [ ] Add client API helper (if needed) to fetch `/api/sessions?includeCompleted=true`.
+- [ ] Fetch completed sessions in `client/src/pages/TasksPage.jsx`.
+- [ ] Derive progress deterministically by matching `participant.taskId` to roadmap focus blocks.
+- [ ] Pass only derived progress data into `PlanningSummary` and `RoadmapTimeline`.
+- [ ] Update `RoadmapTimeline` to visually distinguish completed/active/remaining blocks and display overall % complete.
+- [ ] Run `npm --prefix client run lint` and `npm --prefix client run build` and report results.
 
