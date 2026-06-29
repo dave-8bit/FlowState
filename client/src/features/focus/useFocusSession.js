@@ -134,8 +134,11 @@ export function useFocusSession() {
         const next = {
           ...prev,
           sessionId: payload.sessionId,
-          taskId: payload.taskId ?? null,
-          blockId: payload.blockId ?? null,
+          // Identity merge rule:
+          // - If payload contains a value (including null), use it.
+          // - If payload omits the field (undefined), preserve existing identity.
+          taskId: payload.taskId ?? prev.taskId,
+          blockId: payload.blockId ?? prev.blockId,
           durationMinutes: payload.timerMinutes ?? null,
           startsAtMs: startedAtMs,
           endsAtMs,

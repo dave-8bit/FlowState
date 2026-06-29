@@ -42,7 +42,9 @@ router.post("/sessions", async (req, res) => {
 
       io.to(`user:${creatorId}`).emit("focus:started", {
         sessionId: session.id,
-        taskId: null,
+        // Emit identity using the same request/local values we persisted.
+        taskId: taskId ?? null,
+        blockId: blockId ?? null,
         timerMinutes: session.timerMinutes,
         status: "running",
         startedAt: startedAt.toISOString(),

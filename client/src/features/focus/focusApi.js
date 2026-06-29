@@ -14,8 +14,9 @@ export async function startSession({ title, timerMinutes, taskId, blockId }) {
 }
 
 export async function closeSession({ sessionId }) {
-  return client.postJSON(`/api/sessions/${sessionId}/close`, {
+  return client.patchJSON(`/api/sessions/${sessionId}/close`, {
     isActive: false,
   })
 }
+
 
