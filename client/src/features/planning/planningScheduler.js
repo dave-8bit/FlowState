@@ -61,22 +61,13 @@ function parseTimeHHMM(value) {
 // intentionally no time-of-day math in the pure scheduler (capacity is controlled by availableHoursPerDay)
 
 
-function deterministicBlockId({ taskId, scheduledDate, blockIndexWithinTask, durationMinutes }) {
-  // Deterministic, reproducible identity for a scheduled focus block.
-  // No randomness, no timestamps.
-  return `${taskId}::${scheduledDate}::${blockIndexWithinTask}::${durationMinutes}`
-}
 
-function splitTaskIntoFocusBlocks({
-  taskId,
-  title,
-  durationMinutes,
-  focusMinutes,
-  // scheduledDate is required for deterministic blockId.
-  // It will be provided once blocks are assigned to a day.
-  scheduledDate,
-}) {
 
+// Deterministic block identity is generated once blocks are assigned to a specific
+// scheduled day/date (see insertion into schedule[].sessions). No placeholder values.
+
+
+function splitTaskIntoFocusBlocks({ taskId, title, durationMinutes, focusMinutes }) {
   const sessions = []
   if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) return sessions
 
@@ -84,17 +75,12 @@ function splitTaskIntoFocusBlocks({
   let blockIndexWithinTask = 0
   while (remaining > 0) {
     const block = Math.min(focusMinutes, remaining)
-    const blockId = deterministicBlockId({
-      taskId,
-      scheduledDate,
-      blockIndexWithinTask,
-      durationMinutes: block,
-    })
 
     sessions.push({
-      blockId,
+      // blockId is intentionally NOT generated here because we don't yet know the final scheduled day.
       taskId,
       title,
+      blockIndexWithinTask,
       durationMinutes: block,
     })
 
@@ -103,6 +89,7 @@ function splitTaskIntoFocusBlocks({
   }
   return sessions
 }
+
 
 
 export function generatePlanningSchedule({ tasks, planningSettings }) {
@@ -186,14 +173,12 @@ export function generatePlanningSchedule({ tasks, planningSettings }) {
 
       const title = task?.title || ''
       // Split into focus blocks deterministically.
-      // We generate blocks with a placeholder scheduledDate; we then
-      // re-materialize blockId once we know the real day/date.
+      // Phase 1: do NOT generate blockId yet (day/date is not known).
       currentTaskSessions = splitTaskIntoFocusBlocks({
         taskId: task?.id,
         title,
         durationMinutes,
         focusMinutes: focusMinutesSafe,
-        scheduledDate: 'PENDING',
       })
 
 
@@ -241,9 +226,13 @@ export function generatePlanningSchedule({ tasks, planningSettings }) {
       }
 
       if (blockMinutes <= remainingCapacity) {
-        sessionsForDay.push(nextSession)
+        // Phase 2 (final): we now know the real scheduled day/date, so generate blockId here.
+        const scheduledDate = toISODateOnly(dayCursor)
+        const blockId = `${nextSession.taskId}::${scheduledDate}::${nextSession.blockIndexWithinTask}::${nextSession.durationMinutes}`
+        sessionsForDay.push({ ...nextSession, blockId })
         remainingCapacity -= blockMinutes
         currentTaskSessions.shift()
+
 
         // If we finished the current task, advance to next one.
         if (currentTaskSessions.length === 0) {
