@@ -56,17 +56,21 @@ router.post("/sessions", async (req, res) => {
 
 router.get("/sessions", async (req, res) => {
   try {
+    const includeCompleted = String(req.query?.includeCompleted || '').toLowerCase() === 'true'
+
     const sessions = await prisma.focusSession.findMany({
-      where: { isActive: true },
+      where: includeCompleted ? {} : { isActive: true },
       include: {
         participants: true,
       },
       orderBy: { createdAt: "desc" },
     });
 
+
     const formatted = sessions.map((s) => ({
       ...s,
       participantCount: s.participants.length,
+      // keep participants as-is so client can read participant.taskId for progress mapping
     }));
 
     res.json(formatted);
@@ -74,6 +78,7 @@ router.get("/sessions", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch sessions" });
   }
 });
+
 
 router.get("/sessions/:id", async (req, res) => {
   try {
