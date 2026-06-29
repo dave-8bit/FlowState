@@ -166,8 +166,73 @@ export default function TasksPage() {
     })
   }, [tasks, planningSettings])
 
+  const [completedTaskIds, setCompletedTaskIds] = useState(() => new Set())
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadCompleted() {
+      try {
+        const sessions = await fetchSessions({ includeCompleted: true })
+        if (cancelled) return
+
+        const ids = new Set()
+        const completedSessions = Array.isArray(sessions) ? sessions : []
+        for (const s of completedSessions) {
+          const status = s?.status || s?.sessionStatus || s?.state
+          if (status !== 'completed') continue
+
+          const participants = Array.isArray(s?.participants) ? s.participants : []
+          for (const p of participants) {
+            const taskId = p?.taskId
+            if (taskId) ids.add(taskId)
+          }
+        }
+
+        setCompletedTaskIds(ids)
+      } catch (e) {
+        // if sessions fail, treat as nothing completed
+        void e
+      }
+    }
+
+    loadCompleted()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const progress = useMemo(() => {
+    const schedule = planningSchedule?.schedule || []
+
+    const focusBlocks = []
+    for (const day of schedule) {
+      const sessions = day?.sessions || []
+      for (const s of sessions) {
+        if (s?.taskId) {
+          focusBlocks.push({ taskId: s.taskId, order: s.order, durationMinutes: s.durationMinutes })
+        }
+      }
+    }
+
+    const completedBlocks = focusBlocks.filter((b) => completedTaskIds.has(b.taskId))
+    const remainingBlocks = focusBlocks.filter((b) => !completedTaskIds.has(b.taskId))
+    const total = focusBlocks.length
+
+    const percentComplete = total > 0 ? (completedBlocks.length / total) * 100 : 0
+    const activeBlock = remainingBlocks[0] || null
+
+    return {
+      completedBlocksCount: completedBlocks.length,
+      remainingBlocksCount: remainingBlocks.length,
+      activeBlock,
+      percentComplete,
+    }
+  }, [planningSchedule, completedTaskIds])
+
 
   const onStartFocus = useCallback(
+
     (taskId, durationMinutes) => {
       actions.start({ durationMinutes, taskId })
     },
@@ -207,6 +272,7 @@ export default function TasksPage() {
         planningState={planningFeasibility}
         planningSchedule={planningSchedule}
         onStartFocus={onStartFocus}
+        progress={progress}
       />
     </div>
   )

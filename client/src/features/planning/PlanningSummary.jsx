@@ -2,14 +2,20 @@ import { useMemo } from 'react'
 
 import RoadmapTimeline from './RoadmapTimeline.jsx'
 
-export default function PlanningSummary({ planningState, planningSchedule, tasks, onStartFocus }) {
+export default function PlanningSummary({
+  planningState,
+  planningSchedule,
+  tasks,
+  onStartFocus,
+  progress,
+}) {
   const { state, statusMessage, summary } = planningState || {}
-
 
   const requiredHoursPerDay = summary?.requiredHoursPerDay
   const availableWorkingTimeMinutes = summary?.availableWorkingTimeMinutes
   const totalWorkRemainingMinutes = summary?.totalWorkRemainingMinutes
   const daysRemaining = summary?.daysRemaining
+
 
   const formatHours = (minutes) => {
     if (!Number.isFinite(minutes)) return '0'
@@ -80,8 +86,8 @@ export default function PlanningSummary({ planningState, planningSchedule, tasks
         planningSchedule={planningSchedule}
         tasks={tasks}
         onStartFocus={onStartFocus}
+        progress={progress}
       />
-
     </div>
 
   )

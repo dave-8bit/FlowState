@@ -1,6 +1,12 @@
-export default function RoadmapTimeline({ planningSchedule, tasks, onStartFocus }) {
+export default function RoadmapTimeline({
+  planningSchedule,
+  tasks,
+  onStartFocus,
+  progress,
+}) {
   const schedule = planningSchedule?.schedule || []
   const unscheduledTaskIds = planningSchedule?.unscheduledTasks || []
+
 
 
   const tasksById = (Array.isArray(tasks) ? tasks : []).reduce((acc, t) => {
@@ -37,6 +43,26 @@ export default function RoadmapTimeline({ planningSchedule, tasks, onStartFocus 
     return String(Math.round(hours * 100) / 100)
   }
 
+  const completedCount = progress?.completedBlocksCount ?? 0
+  const remainingCount = progress?.remainingBlocksCount ?? 0
+  const percentComplete = progress?.percentComplete ?? 0
+
+  const completionPillColor = percentComplete >= 100 ? 'seagreen' : '#111827'
+
+  const completionPillStyle = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '6px 10px',
+    borderRadius: 999,
+    border: '1px solid rgba(0,0,0,0.12)',
+    background: 'rgba(0,0,0,0.02)',
+    color: completionPillColor,
+    fontWeight: 900,
+    fontSize: 13,
+  }
+
+
   const focusBlocksByDay = (day) => {
     const sessions = day?.sessions || []
     // sessions are expected to be in already-determined order
@@ -45,7 +71,13 @@ export default function RoadmapTimeline({ planningSchedule, tasks, onStartFocus 
 
   return (
     <div style={{ marginTop: 14, display: 'grid', gap: 10 }}>
-      <div style={{ fontWeight: 900 }}>Day-by-day roadmap</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ fontWeight: 900 }}>Day-by-day roadmap</div>
+        <div style={completionPillStyle}>
+          {completedCount} completed • {remainingCount} remaining • {Math.max(0, Math.min(100, Math.round(percentComplete)))}%
+        </div>
+      </div>
+
 
       {schedule.length === 0 ? (
         <div style={{ color: '#666' }}>No schedule generated yet.</div>
