@@ -178,9 +178,11 @@ export default function TasksPage() {
 
         const ids = new Set()
         const completedSessions = Array.isArray(sessions) ? sessions : []
+
         for (const s of completedSessions) {
-          const status = s?.status || s?.sessionStatus || s?.state
-          if (status !== 'completed') continue
+          // Backend GET /api/sessions?includeCompleted=true returns all sessions,
+          // and completed sessions are represented by isActive === false.
+          if (s?.isActive !== false) continue
 
           const participants = Array.isArray(s?.participants) ? s.participants : []
           for (const p of participants) {
@@ -188,6 +190,7 @@ export default function TasksPage() {
             if (taskId) ids.add(taskId)
           }
         }
+
 
         setCompletedTaskIds(ids)
       } catch (e) {
