@@ -12,10 +12,7 @@ import { calculatePlanningFeasibility } from '../features/planning/planningFeasi
 import { generatePlanningSchedule } from '../features/planning/planningScheduler.js'
 import { prioritizeTasks } from '../features/planning/planningPrioritization.js'
 
-
-
-
-
+import { fetchSessions } from '../features/focus/focusSessionsService.js'
 
 function priorityLabel(priority) {
   switch (priority) {
