@@ -17,6 +17,7 @@ const PRESET_DURATIONS_MINUTES = [25, 50, 90]
 const initialState = {
   sessionId: null,
   taskId: null,
+  blockId: null,
   durationMinutes: null,
   startsAtMs: null,
   endsAtMs: null,
@@ -109,10 +110,6 @@ export function useFocusSession() {
     // Prevent duplicate listeners by subscribing once for each handler.
 
     const handleStarted = (payload) => {
-
-
-
-
       if (!payload?.sessionId) return
 
       const endsAtMs = payload.endsAt ? Date.parse(payload.endsAt) : null
@@ -138,6 +135,7 @@ export function useFocusSession() {
           ...prev,
           sessionId: payload.sessionId,
           taskId: payload.taskId ?? null,
+          blockId: payload.blockId ?? null,
           durationMinutes: payload.timerMinutes ?? null,
           startsAtMs: startedAtMs,
           endsAtMs,
@@ -229,7 +227,7 @@ export function useFocusSession() {
   }, [session.status, session, stopInterval])
 
   const start = useCallback(
-    async ({ durationMinutes, taskId }) => {
+    async ({ durationMinutes, taskId, blockId }) => {
       const duration = Number(durationMinutes)
       if (!Number.isFinite(duration) || duration <= 0) {
         throw new Error('Invalid duration')
@@ -239,14 +237,17 @@ export function useFocusSession() {
       }
 
       const title = 'Focus Session'
-      const started = await startSession({ title, timerMinutes: duration, taskId })
+      const started = await startSession({ title, timerMinutes: duration, taskId, blockId })
 
       const sessionId = started?.id
       if (!sessionId) {
         throw new Error('Missing session id')
       }
 
-      const next = buildStartState({ sessionId, taskId, durationMinutes: duration })
+      const next = {
+        ...buildStartState({ sessionId, taskId, durationMinutes: duration }),
+        blockId: blockId ?? null,
+      }
       persist(next)
       return next
     },

@@ -235,13 +235,11 @@ export default function TasksPage() {
 
 
   const onStartFocus = useCallback(
-
-    (taskId, durationMinutes) => {
-      actions.start({ durationMinutes, taskId })
+    (taskId, blockId, durationMinutes) => {
+      actions.start({ durationMinutes, taskId, blockId })
     },
     [actions]
   )
-
 
   return (
     <div style={{ padding: 24 }}>

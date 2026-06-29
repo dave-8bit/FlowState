@@ -13,7 +13,7 @@ router.use(authenticateToken);
 
 router.post("/sessions", async (req, res) => {
   try {
-    const { title, timerMinutes } = req.body || {};
+    const { title, timerMinutes, taskId, blockId } = req.body || {};
     const creatorId = req.user.userId;
     if (!creatorId) return res.status(401).json({ error: "Unauthorized" });
 
@@ -25,6 +25,8 @@ router.post("/sessions", async (req, res) => {
         participants: {
           create: {
             userId: creatorId,
+            ...(taskId ? { taskId } : {}),
+            ...(blockId ? { blockId } : {}),
           },
         },
       },

@@ -137,7 +137,7 @@ export default function RoadmapTimeline({
                           <div style={{ fontWeight: 900 }}>{s.durationMinutes} min</div>
                           <button
                             type="button"
-                            onClick={() => onStartFocus?.(s.taskId, s.durationMinutes)}
+                            onClick={() => onStartFocus?.(s.taskId, s.blockId, s.durationMinutes)}
                             style={{
                               padding: '8px 12px',
                               borderRadius: 12,
