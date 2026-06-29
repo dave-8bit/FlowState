@@ -61,18 +61,49 @@ function parseTimeHHMM(value) {
 // intentionally no time-of-day math in the pure scheduler (capacity is controlled by availableHoursPerDay)
 
 
-function splitTaskIntoFocusBlocks({ taskId, title, durationMinutes, focusMinutes }) {
+function deterministicBlockId({ taskId, scheduledDate, blockIndexWithinTask, durationMinutes }) {
+  // Deterministic, reproducible identity for a scheduled focus block.
+  // No randomness, no timestamps.
+  return `${taskId}::${scheduledDate}::${blockIndexWithinTask}::${durationMinutes}`
+}
+
+function splitTaskIntoFocusBlocks({
+  taskId,
+  title,
+  durationMinutes,
+  focusMinutes,
+  // scheduledDate is required for deterministic blockId.
+  // It will be provided once blocks are assigned to a day.
+  scheduledDate,
+}) {
+
   const sessions = []
   if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) return sessions
 
   let remaining = durationMinutes
+  let blockIndexWithinTask = 0
   while (remaining > 0) {
     const block = Math.min(focusMinutes, remaining)
-    sessions.push({ taskId, title, durationMinutes: block })
+    const blockId = deterministicBlockId({
+      taskId,
+      scheduledDate,
+      blockIndexWithinTask,
+      durationMinutes: block,
+    })
+
+    sessions.push({
+      blockId,
+      taskId,
+      title,
+      durationMinutes: block,
+    })
+
     remaining -= block
+    blockIndexWithinTask += 1
   }
   return sessions
 }
+
 
 export function generatePlanningSchedule({ tasks, planningSettings }) {
   const planningDaysArr = Array.isArray(planningSettings?.workingDays)
@@ -155,12 +186,19 @@ export function generatePlanningSchedule({ tasks, planningSettings }) {
 
       const title = task?.title || ''
       // Split into focus blocks deterministically.
+      // We generate blocks with a placeholder scheduledDate; we then
+      // re-materialize blockId once we know the real day/date.
       currentTaskSessions = splitTaskIntoFocusBlocks({
         taskId: task?.id,
         title,
         durationMinutes,
         focusMinutes: focusMinutesSafe,
+        scheduledDate: 'PENDING',
       })
+
+
+
+
 
       return
     }
